@@ -153,16 +153,13 @@ ipcMain.on('dragMain', (event, mouseOnPage) => {
         let startX = newWinPointX-chatting_width-5; 
         let startY = newWinPointY-(chatting_height-live2d_height); 
         if(startX<0) {
-            startX=newWinPointX+chatting_width+5; 
+            startX=newWinPointX+livd2d_width+5; 
         }
         if(startX+chatting_width>size.width) {
             startX = newWinPointX-chatting_width-5; 
         }
         if(startY<0) {
-            startY=newWinPointY; 
-        }
-        if(startY+chatting_height>size.height) {
-            startY = newWinPointY-(chatting_height-live2d_height); 
+            startY=0; 
         }
         chattingWin.setPosition(startX, startY);
         chattingWin.setSize(chatting_width, chatting_height); 
@@ -276,10 +273,10 @@ function showChattingWin(textChatting) {
     let startX = mainX-chatting_width-5; 
     let startY = mainY-(chatting_height-live2d_height); 
     if(startX<0) {
-        startX = mainX+chatting_width+5; 
+        startX = mainX+livd2d_width+5; 
     }
     if(startY<0) {
-        startY = mainY; 
+        startY = 0; 
     }
     chattingWin.setPosition(startX, startY); 
     
@@ -295,5 +292,3 @@ app.on('window-all-closed', function () {
         app.quit()
     }
 })
-
-
