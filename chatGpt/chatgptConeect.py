@@ -1,6 +1,6 @@
 import openai
 
-openai.api_key='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'
+openai.api_key='sk-vJGGvjcIric8ZJkAIT3BlbkFv9DWWzzM3pUQCDv'
 
 def changeApiKey(newKey: str):
     openai.api_key=newKey
