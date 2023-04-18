@@ -61,6 +61,7 @@ function showChatting(chattingText) {
 }
 
 //该拖拽方法有个问题，鼠标甩的太快的时候，会由于鼠标脱离了窗体区域而导致触发不了鼠标移动事件，从而移动中断
+//不过通过window.addeventlistener全局拖拽监听解决
 function makeDraggable() {
     var chat_top = this.document.querySelector(".chat_top");
     //指示正在执行拖动操作
@@ -92,7 +93,7 @@ function makeDraggable() {
         mousedown_left = false;
         dragging = false;
     });
-    chat_top.addEventListener('mousemove', () => {
+    window.addEventListener('mousemove', () => {
         //按下鼠标并移动，判定为拖动窗口
         if (mousedown_left) {
             dragging = true;
