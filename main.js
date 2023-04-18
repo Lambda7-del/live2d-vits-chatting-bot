@@ -15,6 +15,14 @@ const screen_main = electron.screen;
 
 const path = require('path')
 
+//live2d窗口大小
+const livd2d_width=350; 
+const live2d_height=350; 
+
+//chatting窗口大小
+const chatting_width=480; 
+const chatting_height=680; 
+
 //主窗口对象
 var mainWindow = null
 //chatting窗口对象
@@ -22,11 +30,14 @@ var chattingWin = null
 //系统托盘对象
 var appTray = null
 
+//chattingWin与mainWin脱离
+var ifFreeChattingWin=true
+
 //APP初始化加载
 app.on('ready', () => {
     //设置主窗口
     mainWindow = new BrowserWindow({
-        width: 350, height: 350,
+        width: livd2d_width, height: live2d_height,
         frame: false,                //去掉窗口边框和标题栏
         // backgroundColor: "#fff",     //背景色
         //窗体透明属性，实际使用时发现如果窗体一部分，从拐角移出屏幕，再移回来，移出去的透明部分会变黑色
@@ -134,8 +145,29 @@ ipcMain.on('dragMain', (event, mouseOnPage) => {
 
     //4.移动窗口
     mainWindow.setPosition(newWinPointX, newWinPointY);
-    mainWindow.setSize(350, 350)
+    mainWindow.setSize(livd2d_width, live2d_height)
     mainWindow.transparent = true;
+
+    //5.chattingWin非脱离情况下移动chattingWin
+    if(ifFreeChattingWin==false) {
+        let startX = newWinPointX-chatting_width-5; 
+        let startY = newWinPointY-(chatting_height-live2d_height); 
+        if(startX<0) {
+            startX=newWinPointX+chatting_width+5; 
+        }
+        if(startX+chatting_width>size.width) {
+            startX = newWinPointX-chatting_width-5; 
+        }
+        if(startY<0) {
+            startY=newWinPointY; 
+        }
+        if(startY+chatting_height>size.height) {
+            startY = newWinPointY-(chatting_height-live2d_height); 
+        }
+        chattingWin.setPosition(startX, startY);
+        chattingWin.setSize(chatting_width, chatting_height); 
+        chattingWin.transparent = true;
+    }
 })
 
 //ipc监听，获取主窗体位置
@@ -146,6 +178,7 @@ ipcMain.on('getMainPoint', (event, msg) => {
 
 //ipc监听，拖拽chattingWin
 ipcMain.on('dragChattingWin', (event, mouseOnPage) => {
+    ifFreeChattingWin=true; //单独拖动chattingWin后，分离mainWin与chattingWin
     //1.获取鼠标新位置
     const { x, y } = screen_main.getCursorScreenPoint();
     // console.log("鼠标新左键坐标:" + x + " " + y)
@@ -189,8 +222,7 @@ ipcMain.on('dragChattingWin', (event, mouseOnPage) => {
 
     //4.移动窗口
     chattingWin.setPosition(newWinPointX, newWinPointY);
-    chattingWin.setSize(480, 680); 
-    console.log(chattingWin.getSize())
+    chattingWin.setSize(chatting_width, chatting_height); 
     chattingWin.transparent = true;
 })
 
@@ -203,10 +235,12 @@ ipcMain.on('getChattingWinPoint', (event, msg) => {
 //ipc监听，打开chattingBox
 ipcMain.on('openChatting', (event, data) => {
     showChattingWin(data); 
+    ifFreeChattingWin=false; //启动chattingWin后，连接chattingWin与mainWin
 })
 
 //ipc监听，关闭chattingBox
 ipcMain.on("closeChatting", (event) => {
+    ifFreeChattingWin=true; //关闭chattingWin时，断开chattingWin与mainWin
     chattingWin.close(); 
     mainWindow.webContents.send("closeChatting"); 
 })
@@ -220,10 +254,12 @@ ipcMain.on("push_chattingText", (event, data )=> {
 //创建chatting窗口
 function showChattingWin(textChatting) {
     chattingWin=new BrowserWindow({
-        width: 480, height: 680,
+        width: chatting_width, height: chatting_height,
         frame: false,                //去掉窗口边框和标题栏
         transparent: true,          //窗口透明
         resizable: true,            //是否允许改变窗口尺寸
+        alwaysOnTop: true,          //窗口是否总是在最前端
+        skipTaskbar: true,          //任务栏不显示图标
         webPreferences: {
             nodeIntegration: true,      //node下所有东西都可以在渲染进程中使用
             contextIsolation: false    //上下文不中断
@@ -234,6 +270,19 @@ function showChattingWin(textChatting) {
     //关闭窗口时初始化主窗口(避免浪费内存)
     //监听到closed事件后执行
     chattingWin.on('closed', () => { chattingWin = null }); 
+    //设置初始位置
+    let mainX = mainWindow.getPosition()[0]; 
+    let mainY = mainWindow.getPosition()[1]; 
+    let startX = mainX-chatting_width-5; 
+    let startY = mainY-(chatting_height-live2d_height); 
+    if(startX<0) {
+        startX = mainX+chatting_width+5; 
+    }
+    if(startY<0) {
+        startY = mainY; 
+    }
+    chattingWin.setPosition(startX, startY); 
+    
     chattingWin.webContents.on('did-finish-load',(event)=>{
         // 发送消息给渲染进程chattingWin
         chattingWin.webContents.send("openChatting", textChatting); 
