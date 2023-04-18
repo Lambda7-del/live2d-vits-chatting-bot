@@ -24,6 +24,8 @@ Based on electron/node.js, with live2d.js, live2d interface is built. In this se
 ## intro
 Based on python/pytorch. vits is a deep learning network, which is train to transform text sequence into voice of certain speaker. In this section, 'class vits' is rebuilt from ref.[2] and training module is removed. Several pre-trained vits models are collected from internet and used. Now this module haven't connected with live2d yet. 
 
+The model.pth is too large so they are not uploaded. It is easy to find resource. 'config.json' is saved at /vits/configs/, 'model.pth' is saved at /vits/models/, and rename them as same name. 
+
 ## env
 1. python 3.9.16
 2. torch 1.13.1+cu117
@@ -39,7 +41,11 @@ Based on python/pytorch. vits is a deep learning network, which is train to tran
 
 # gpt
 ## intro
-Key part of chatting-bot. Now chatgpt-turbo from openai is used. An **api-key** of openai is needed to connect chatgpt-turbo to build a chatting system. And due to region, connection might not be built. (So how to connect to chatgpt?It is hard to explain. Even though I explain, some may still not understand. If I explain, and you get it, then explaination is not needed). This module probably would be changed because chatgpt may become expensive in the future. 
+Key part of chatting-bot. Now chatgpt-turbo from openai is used. An **api-key** of openai is needed to connect chatgpt-turbo to build a chatting system. And due to region, connection might not be built. (So how to connect to chatgpt?It is hard to explain. Even though I explain, some may still not understand. If I explain, and you get it, then explaination is not needed). 
+
+The api-key here is useless, save effective api-key in /chatGpt/openai_api_key.json
+
+This module probably would be changed because chatgpt may become expensive in the future. 
 
 ## env
 1. python 3.9.16
