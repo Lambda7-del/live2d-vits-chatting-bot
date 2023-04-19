@@ -2,8 +2,8 @@
 Try to build a chatting-bot with gpt, vits and live2d
 
 # reference
-[1] https://github.com/CjangCjengh/vits
-[2] https://github.com/MikuNyanya/live2dPet_windows
+[1] https://github.com/CjangCjengh/vits 
+[2] https://github.com/MikuNyanya/live2dPet_windows 
 
 # live2d
 ## intro
