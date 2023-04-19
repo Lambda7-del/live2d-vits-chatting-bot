@@ -98,6 +98,9 @@ app.on('ready', () => {
     const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
     //设置此图标的上下文菜单
     appTray.setContextMenu(contextMenu);
+
+    //开启后端python
+    startPython()
 })
 
 //ipc监听，拖拽主窗体
@@ -292,3 +295,13 @@ app.on('window-all-closed', function () {
         app.quit()
     }
 })
+
+//启动api.py
+function startPython() {
+    const spawn = require('child_process').spawn
+    let py = spawn('python',['api.py'])
+    py.stdout.on('data', data => console.log('data : ', data.toString()))
+    py.on('close', ()=>{
+    // Python ends, do stuff
+    })
+}
