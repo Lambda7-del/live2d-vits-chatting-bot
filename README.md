@@ -22,9 +22,9 @@ Based on electron/node.js, with live2d.js, live2d interface is built. In this se
 
 # vits
 ## intro
-Based on python/pytorch. vits is a deep learning network, which is train to transform text sequence into voice of certain speaker. In this section, 'class vits' is rebuilt from ref.[2] and training module is removed. Several pre-trained vits models are collected from internet and used. Now this module haven't connected with live2d yet. 
+Based on python/pytorch. vits is a deep learning network, which is train to transform text sequence into voice of certain speaker. In this section, 'class vits' is rebuilt from ref.[2] and training module is removed. Several pre-trained vits models are collected from internet and used
 
-The model.pth is too large so they are not uploaded. It is easy to find resource. 'config.json' is saved at /vits/configs/, 'model.pth' is saved at /vits/models/, and rename them as same name. 
+A vits model includes 'config.json' and 'model.pth'. 'config.json' is saved at /vits/configs/, 'model.pth' is saved at /vits/models/, and rename them as same name. 
 
 ## env
 1. python 3.9.16
@@ -43,7 +43,7 @@ The model.pth is too large so they are not uploaded. It is easy to find resource
 ## intro
 Key part of chatting-bot. Now chatgpt-turbo from openai is used. An **api-key** of openai is needed to connect chatgpt-turbo to build a chatting system. And due to region, connection might not be built. (So how to connect to chatgpt?It is hard to explain. Even though I explain, some may still not understand. If I explain, and you get it, then explaination is not needed). 
 
-The api-key here is useless, save effective api-key in /chatGpt/openai_api_key.json
+The api-key here is useless, save effective api-key in /chatGpt/openai_api_key.json, and change it in chatGpt/chatgptConnect.py
 
 This module probably would be changed because chatgpt may become expensive in the future. 
 
@@ -57,8 +57,9 @@ This module probably would be changed because chatgpt may become expensive in th
 3. An interface based on thinter is built, where user can input text and get reply from chatting-bot and choose **api-key** of openai. 
 
 # test
-1. live2d interface: start with package.json
-2. gpt-vits: start with test.py
+1. total process: start with package.json
+2. gpt-vits only: start with test.py
 
 # now process
-Connection between **vits** and **gpt** is built. live2d interface is independent at present. 
+Connection among **vits**, **gpt** and **live2d** is built. 
+Can't choose speaker id and api-key in total process yet. 
