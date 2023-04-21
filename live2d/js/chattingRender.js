@@ -56,7 +56,12 @@ function getReply(str) {
         })
 }
 
-//reply
+//语音功能
+function getVoice(str, id) {
+    fetch('http://localhost:7777/voice/'+str+'/'+id); 
+}
+
+//显示回复
 function showReply(str) {
     if(str.length>0) {
         var reply_message=document.getElementById("chat_middle_item");
@@ -78,6 +83,8 @@ function showReply(str) {
         ipcRenderer.send("push_chattingText", {'user': 'TA', 'time': time, 'text': str}); 
         // 滚动到底
         reply_message.scrollTop = reply_message.scrollHeight;
+        //语音播报
+        getVoice(str, 94); 
     }
 }
 
