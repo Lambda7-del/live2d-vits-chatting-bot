@@ -299,9 +299,14 @@ app.on('window-all-closed', function () {
 //启动api.py
 function startPython() {
     const spawn = require('child_process').spawn
-    let py = spawn('python',['api.py'])
+    let py = spawn('python', ['api.py'])
     py.stdout.on('data', data => console.log('data : ', data.toString()))
     py.on('close', ()=>{
     // Python ends, do stuff
     })
 }
+
+process.on('unhandledRejection', (reason, p) => {
+    console.log('Promise: ', p, 'Reason: ', reason)
+    // do something
+})
