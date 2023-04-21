@@ -22,7 +22,8 @@ function sending() {
             var date=new Date();
             var hour=date.getHours();
             var mm=date.getMinutes();
-            var time=hour+':'+mm;
+            if(mm<10) var time=hour+':0'+mm;
+            else var time=hour+':'+mm;
             var ans='<div class="chat_right_item_1 clearfix">ME</div>'+
                 '<div class="chat_right_item_2">'+
                     '<div class="chat_right_time clearfix">'+time+'</div>'+
@@ -36,13 +37,48 @@ function sending() {
             // 保存信息
             ipcRenderer.send("push_chattingText", {'user': 'ME', 'time': time, 'text': str}); 
             // 滚动到底
-            var element = document.getElementById("chat_middle_item");
-            element.scrollTop = element.scrollHeight;
+            send_message.scrollTop = send_message.scrollHeight;
+            getReply(str); 
         }
     });
     // 滚动到底
     var element = document.getElementById("chat_middle_item");
     element.scrollTop = element.scrollHeight;
+}
+
+//获取回复
+function getReply(str) {
+    console.log(str)
+    fetch('http://localhost:7777/chatting/'+str)
+        .then(response => response.json())
+        .then(data => {
+            showReply(data); 
+        })
+}
+
+//reply
+function showReply(str) {
+    if(str.length>0) {
+        var reply_message=document.getElementById("chat_middle_item");
+        var date=new Date();
+        var hour=date.getHours();
+        var mm=date.getMinutes();
+        if(mm<10) var time=hour+':0'+mm;
+        else var time=hour+':'+mm;
+        var ans='<div class="chat_left_item_1 clearfix">TA</div>'+
+            '<div class="chat_left_item_2">'+
+                '<div class="chat_left_time clearfix">'+time+'</div>'+
+                '<div class="chat_left_content clearfix">'+str+'</div>'
+                +'</div>';
+        var oLi=document.createElement("div");
+        oLi.setAttribute("class","chat_left");
+        oLi.innerHTML=ans;
+        reply_message.append(oLi);
+        // 保存信息
+        ipcRenderer.send("push_chattingText", {'user': 'TA', 'time': time, 'text': str}); 
+        // 滚动到底
+        reply_message.scrollTop = reply_message.scrollHeight;
+    }
 }
 
 function showChatting(chattingText) {
@@ -118,5 +154,3 @@ function makeDraggable() {
 ipcRenderer.on("openChatting", (event, data) => {
     showChatting(data); 
 }); 
-
-
