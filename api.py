@@ -1,5 +1,17 @@
+import vits
+ansNet=vits.vitsModel(hp_path="./vits/configs/ru.json", model_path="./vits/models/ru.pth")
+
+from playsound import playsound
+
+import chatGpt.chatgptConeect as cc
+chatNet=cc.chatgptContinueConnect()
+
+import text_dealing as td
+
+def playAu(): 
+    playsound('cache/audio/audio.wav')
+
 from flask import Flask, jsonify
-import time
 
 app = Flask(__name__)
 
@@ -9,8 +21,14 @@ def echo(text):
 
 @app.route('/chatting/<text>')
 def chatting(text):
-    time.sleep(5)
-    return jsonify(f'a对对对')
+    rep=chatNet.reply(text)
+    return jsonify(rep)
+
+@app.route('/voice/<text>/<id>')
+def voice(text, id): 
+    text=td.select_lang_mode(text)
+    ansNet.text_to_audio(text=text, speaker_id=int(id))
+    playAu()
 
 if __name__ == '__main__':
     port = 7777
