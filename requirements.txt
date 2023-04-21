@@ -9,7 +9,7 @@ pyopenjtalk==0.2.0
 jamo==0.4.1
 pypinyin==0.44.0
 jieba==0.42.1
-protobuf==3.19.0
+protobuf==3.19.5
 cn2an==0.5.17
 inflect==6.0.0
 eng_to_ipa==0.0.2
