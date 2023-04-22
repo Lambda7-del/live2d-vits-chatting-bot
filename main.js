@@ -14,6 +14,13 @@ const Tray = electron.Tray
 const screen_main = electron.screen;
 
 const path = require('path')
+require('@electron/remote/main').initialize(); 
+
+//settingWin默认项
+var morenKey="0"; 
+var morenVits="0"; 
+var morenSpeaker="0"; 
+var morenLive2d="0"; 
 
 //live2d窗口大小
 const livd2d_width=350; 
@@ -23,10 +30,16 @@ const live2d_height=350;
 const chatting_width=480; 
 const chatting_height=680; 
 
+//setting窗口大小
+const setting_width=480; 
+const setting_height=430; 
+
 //主窗口对象
 var mainWindow = null
 //chatting窗口对象
 var chattingWin = null
+//setting窗口对象
+var settingWin = null
 //系统托盘对象
 var appTray = null
 
@@ -35,38 +48,7 @@ var ifFreeChattingWin=true
 
 //APP初始化加载
 app.on('ready', () => {
-    //设置主窗口
-    mainWindow = new BrowserWindow({
-        width: livd2d_width, height: live2d_height,
-        frame: false,                //去掉窗口边框和标题栏
-        // backgroundColor: "#fff",     //背景色
-        //窗体透明属性，实际使用时发现如果窗体一部分，从拐角移出屏幕，再移回来，移出去的透明部分会变黑色
-        //如果把整个窗体全染黑，就会回归透明，并且不会再出现染黑现象，原因不明，解决方法不明
-        transparent: true,          //窗口透明
-        skipTaskbar: true,          //任务栏不显示图标
-        resizable: true,            //是否允许改变窗口尺寸
-        alwaysOnTop: true,          //窗口是否总是在最前端
-        webPreferences: {
-            nodeIntegration: true,      //node下所有东西都可以在渲染进程中使用
-            contextIsolation: false    //上下文不中断
-        }
-    })
-    require('@electron/remote/main').initialize(); 
-    require("@electron/remote/main").enable(mainWindow.webContents); 
-    //窗口鼠标穿透 连同内部内容也会穿透，触发不了任何鼠标事件了
-    // mainWindow.setIgnoreMouseEvents(true)
-    //加载网页
-    mainWindow.loadFile('live2d.html')
-    //关闭窗口时初始化主窗口(避免浪费内存)
-    //监听到closed事件后执行
-    mainWindow.on('closed', () => { mainWindow = null })
-    //获取桌面大小
-    let size = screen_main.getPrimaryDisplay().workAreaSize
-    //获取窗口大小
-    let winSize = mainWindow.getSize()
-    //初始位置右下角
-    mainWindow.setPosition(size.width-winSize[0], size.height-winSize[1])
-
+    showMainWin()
 
     //系统托盘右键菜单
     var trayMenuTemplate = [
@@ -74,6 +56,7 @@ app.on('ready', () => {
             label: '设置',
             click: function () {
                 //打开设置页面
+                showSettingWin(); 
             }
         },
         {
@@ -251,6 +234,65 @@ ipcMain.on("push_chattingText", (event, data )=> {
     mainWindow.webContents.send("push_chattingText", data); 
 })
 
+//ipc监听，更改vits模型
+ipcMain.on("changeVits", (event, data) => {
+    morenVits=data; 
+})
+
+//ipc监听，更改speaker
+ipcMain.on("changeSpeaker", (event, data) => {
+    console.log(data); 
+    morenSpeaker=data; 
+})
+
+//ipc监听，更改api-key
+ipcMain.on("changeApiKey", (event, data) => {
+    morenKey=data; 
+})
+
+//ipc监听，设置setting默认值
+ipcMain.on("settingMoren", (event) => {
+    if(settingWin!=null) {
+        settingWin.webContents.send("settingMoren", [morenKey, morenVits, morenSpeaker, morenLive2d]); 
+    }
+})
+
+//ipc监听，关闭setting窗口
+ipcMain.on("closeSetting", (event) => {
+    settingWin.close(); 
+})
+
+//创建mainWindow
+function showMainWin() {
+    //设置主窗口
+    mainWindow = new BrowserWindow({
+        width: livd2d_width, height: live2d_height,
+        frame: false,                //去掉窗口边框和标题栏
+        // backgroundColor: "#fff",     //背景色
+        //窗体透明属性，实际使用时发现如果窗体一部分，从拐角移出屏幕，再移回来，移出去的透明部分会变黑色
+        //如果把整个窗体全染黑，就会回归透明，并且不会再出现染黑现象，原因不明，解决方法不明
+        transparent: true,          //窗口透明
+        skipTaskbar: true,          //任务栏不显示图标
+        resizable: true,            //是否允许改变窗口尺寸
+        alwaysOnTop: true,          //窗口是否总是在最前端
+        webPreferences: {
+            nodeIntegration: true,      //node下所有东西都可以在渲染进程中使用
+            contextIsolation: false    //上下文不中断
+        }
+    })
+    require("@electron/remote/main").enable(mainWindow.webContents); 
+    mainWindow.loadFile('live2d.html')
+    //关闭窗口时初始化主窗口(避免浪费内存)
+    //监听到closed事件后执行
+    mainWindow.on('closed', () => { mainWindow = null })
+    //获取桌面大小
+    let size = screen_main.getPrimaryDisplay().workAreaSize
+    //获取窗口大小
+    let winSize = mainWindow.getSize()
+    //初始位置右下角
+    mainWindow.setPosition(size.width-winSize[0], size.height-winSize[1])
+}
+
 //创建chatting窗口
 function showChattingWin(textChatting) {
     chattingWin=new BrowserWindow({
@@ -287,6 +329,27 @@ function showChattingWin(textChatting) {
         // 发送消息给渲染进程chattingWin
         chattingWin.webContents.send("openChatting", textChatting); 
     });
+}
+
+//创建setting窗口
+function showSettingWin() {
+    settingWin=new BrowserWindow({
+        width: setting_width, height: setting_height,
+        frame: true, 
+        transparent: true,          //窗口透明
+        resizable: true,            //是否允许改变窗口尺寸
+        alwaysOnTop: true,          //窗口是否总是在最前端
+        skipTaskbar: true,          //任务栏不显示图标
+        webPreferences: {
+            nodeIntegration: true,      //node下所有东西都可以在渲染进程中使用
+            contextIsolation: false    //上下文不中断
+        }
+    }); 
+    require("@electron/remote/main").enable(settingWin.webContents); 
+    settingWin.loadFile('live2d/setting.html'); 
+    //关闭窗口时初始化主窗口(避免浪费内存)
+    //监听到closed事件后执行
+    settingWin.on('closed', () => { chattingWin = null }); 
 }
 
 //所有窗口关闭时，退出APP
