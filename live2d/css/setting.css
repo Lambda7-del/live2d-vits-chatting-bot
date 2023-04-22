@@ -1,0 +1,45 @@
+
+* {
+    padding: 0;
+    margin: 0;
+}
+/*div*/
+.content{
+    width: 450px;
+    height: 380px;
+    margin: auto;
+    border-radius: 10px;
+    border: 2px solid #f4f5f7;
+    background-color: #f4f5f7;
+}
+.select{
+    width: 450px;                 /*宽*/
+    height: 40px;                 /*高*/
+    background-color: #a3b5bb;  /*元素背景颜色*/
+    border: 1px solid #f1e8e8;  /*边框线*/
+    color: #ffffff;             /*字体颜色*/
+    outline:none;                 /*去掉黑框*/
+    font-size: 16px;              /*字体大小*/
+}
+.option{
+    width: 160px;
+    height: 40px;
+}
+.commit{
+    width: 80px;
+    height: 30px;
+    color: white;
+    background-color: #969696;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 5px;
+    position: absolute;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.subtit{
+    text-indent: 5px;
+}
+#apply{
+    left: 200px;
+}
