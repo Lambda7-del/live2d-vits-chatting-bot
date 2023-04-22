@@ -48,7 +48,6 @@ function sending() {
 
 //获取回复
 function getReply(str) {
-    console.log(str)
     fetch('http://localhost:7777/chatting/'+str)
         .then(response => response.json())
         .then(data => {
@@ -57,8 +56,8 @@ function getReply(str) {
 }
 
 //语音功能
-function getVoice(str, id) {
-    fetch('http://localhost:7777/voice/'+str+'/'+id); 
+function getVoice(str) {
+    fetch('http://localhost:7777/voice/'+str); 
 }
 
 //显示回复
@@ -84,7 +83,7 @@ function showReply(str) {
         // 滚动到底
         reply_message.scrollTop = reply_message.scrollHeight;
         //语音播报
-        getVoice(str, 94); 
+        getVoice(str); 
     }
 }
 
