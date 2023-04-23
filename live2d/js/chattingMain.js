@@ -1,4 +1,3 @@
-var chattingText=[{'user': 'TA', 'time': '??:??', 'text': '始まるよ～'}, {'user': 'ME', 'time': '??:??', 'text': '喜多'}, {'user': 'TA', 'time': '??:??', 'text': '郁代'}];
 var ifShowingChatting=false; 
 
 // chatting-button功能
@@ -9,7 +8,7 @@ var ifShowingChatting=false;
             ifShowingChatting=false; 
         }
         else {
-            ipcRenderer.send("openChatting", chattingText); 
+            ipcRenderer.send("openChatting"); 
             ifShowingChatting=true; 
         }
     }); 
@@ -19,11 +18,6 @@ var ifShowingChatting=false;
         $('.chatting-button').fadeOut(600); 
     }); 
 })(); 
-
-//ipc监听，添加chattingText
-ipcRenderer.on("push_chattingText", (event, data) => {
-    chattingText.push(data); 
-})
 
 //ipc监听，来自close按键的关闭chatting
 ipcRenderer.on("closeChatting", (event) => {

@@ -131,7 +131,15 @@ $("#vits-se").on("change", () => {
 $("#speaker-se").on("change", () => {
     //更改speaker
     var newSid=$("#speaker-se option:selected").val(); 
-    changeSpeaker(newSid);  
+    changeSpeaker(newSid); 
+}); 
+
+//select选择后live2d变化
+$("#live2d-se").on("change", () => {
+    //更改live2d
+    var newLive2d=$("#live2d-se option:selected").text(); 
+    var newLive2d_id=$("#live2d-se option:selected").val(); 
+    ipcRenderer.send("changelive2d", [newLive2d, newLive2d_id]); 
 }); 
 
 //确认键
@@ -147,3 +155,18 @@ ipcRenderer.on("settingMoren", (event, data) => {
 })
 
 showItem(); 
+
+window.onload = function () {
+    //是否为开始界面，若是则执行初始化
+    var url = location.search; //获取url中"?“符后的字串
+    if (url.indexOf("?") != -1) {
+        var str = url.substr(1);
+        var start = decodeURIComponent(str.replace("start=",""));//获取url中的id
+        if(start=="0") {
+            //更改live2d
+            var newLive2d=$("#live2d-se option:selected").text(); 
+            var newLive2d_id=$("#live2d-se option:selected").val(); 
+            ipcRenderer.send("changelive2d", [newLive2d, newLive2d_id]); 
+        }
+    }
+}

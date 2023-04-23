@@ -8,8 +8,14 @@ const ipcRenderer = require('electron').ipcRenderer;
 
 window.onload = function () {
     //窗口拖动
-    makeDraggable();
+    ipcRenderer.send("loadlive2d"); 
 }
+
+//ipc监听，加载或更改live2d模型
+ipcRenderer.on("loadlive2d", (event, data) => {
+    loadlive2d("live2d", data);
+    makeDraggable();
+})
 
 //该拖拽方法有个问题，鼠标甩的太快的时候，会由于鼠标脱离了窗体区域而导致触发不了鼠标移动事件，从而移动中断
 //不过通过window.addeventlistener全局添加拖拽监听解决
