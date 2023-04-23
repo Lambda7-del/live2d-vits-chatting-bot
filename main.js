@@ -23,8 +23,8 @@ var morenSpeaker="0";
 var morenLive2d="0"; 
 
 //live2d窗口大小
-const livd2d_width=350; 
-const live2d_height=350; 
+var live2d_width=350; 
+var live2d_height=350; 
 
 //chatting窗口大小
 const chatting_width=480; 
@@ -33,6 +33,9 @@ const chatting_height=680;
 //setting窗口大小
 const setting_width=480; 
 const setting_height=430; 
+
+//chatting 信息
+var chattingText=[{'user': 'TA', 'time': '??:??', 'text': '始まるよ～'}, {'user': 'ME', 'time': '??:??', 'text': '喜多'}, {'user': 'TA', 'time': '??:??', 'text': '郁代'}];
 
 //主窗口对象
 var mainWindow = null
@@ -45,10 +48,14 @@ var appTray = null
 
 //chattingWin与mainWin脱离
 var ifFreeChattingWin=true
+//live2d临时路径
+var live2d_path=''
 
 //APP初始化加载
 app.on('ready', () => {
-    showMainWin()
+    //开启后端python
+    startPython(); 
+    showSettingWin(0); 
 
     //系统托盘右键菜单
     var trayMenuTemplate = [
@@ -56,7 +63,7 @@ app.on('ready', () => {
             label: '设置',
             click: function () {
                 //打开设置页面
-                showSettingWin(); 
+                if(settingWin==null) showSettingWin(1); 
             }
         },
         {
@@ -81,9 +88,6 @@ app.on('ready', () => {
     const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
     //设置此图标的上下文菜单
     appTray.setContextMenu(contextMenu);
-
-    //开启后端python
-    startPython()
 })
 
 //ipc监听，拖拽主窗体
@@ -131,7 +135,7 @@ ipcMain.on('dragMain', (event, mouseOnPage) => {
 
     //4.移动窗口
     mainWindow.setPosition(newWinPointX, newWinPointY);
-    mainWindow.setSize(livd2d_width, live2d_height)
+    mainWindow.setSize(live2d_width, live2d_height)
     mainWindow.transparent = true;
 
     //5.chattingWin非脱离情况下移动chattingWin
@@ -139,7 +143,7 @@ ipcMain.on('dragMain', (event, mouseOnPage) => {
         let startX = newWinPointX-chatting_width-5; 
         let startY = newWinPointY-(chatting_height-live2d_height); 
         if(startX<0) {
-            startX=newWinPointX+livd2d_width+5; 
+            startX=newWinPointX+live2d_width+5; 
         }
         if(startX+chatting_width>size.width) {
             startX = newWinPointX-chatting_width-5; 
@@ -216,22 +220,22 @@ ipcMain.on('getChattingWinPoint', (event, msg) => {
 })
 
 //ipc监听，打开chattingBox
-ipcMain.on('openChatting', (event, data) => {
-    showChattingWin(data); 
+ipcMain.on('openChatting', (event) => {
+    showChattingWin(); 
     ifFreeChattingWin=false; //启动chattingWin后，连接chattingWin与mainWin
 })
 
 //ipc监听，关闭chattingBox
 ipcMain.on("closeChatting", (event) => {
     ifFreeChattingWin=true; //关闭chattingWin时，断开chattingWin与mainWin
-    chattingWin.close(); 
+    chattingWin.destroy(); 
     mainWindow.webContents.send("closeChatting"); 
 })
 
 //ipc监听，保存对话记录
 ipcMain.on("push_chattingText", (event, data )=> {
-    // 发送消息给渲染进程mainWindow
-    mainWindow.webContents.send("push_chattingText", data); 
+    // 保存对话记录
+    chattingText.push(data); 
 })
 
 //ipc监听，更改vits模型
@@ -259,14 +263,26 @@ ipcMain.on("settingMoren", (event) => {
 
 //ipc监听，关闭setting窗口
 ipcMain.on("closeSetting", (event) => {
-    settingWin.close(); 
+    settingWin.destroy(); 
+})
+
+//ipc监听，更改live2d
+ipcMain.on("changelive2d", (event, data) => {
+    switchLive(data[0], data[1]); 
+})
+
+//ipc监听，请求live2d加载
+ipcMain.on("loadlive2d", (event) => {
+    mainWindow.webContents.send("loadlive2d", live2d_path); 
 })
 
 //创建mainWindow
-function showMainWin() {
+function showMainWin(width, height) {
+    live2d_width=width+50; 
+    live2d_height=height+50; 
     //设置主窗口
     mainWindow = new BrowserWindow({
-        width: livd2d_width, height: live2d_height,
+        width: live2d_width, height: live2d_height,
         frame: false,                //去掉窗口边框和标题栏
         // backgroundColor: "#fff",     //背景色
         //窗体透明属性，实际使用时发现如果窗体一部分，从拐角移出屏幕，再移回来，移出去的透明部分会变黑色
@@ -281,7 +297,7 @@ function showMainWin() {
         }
     })
     require("@electron/remote/main").enable(mainWindow.webContents); 
-    mainWindow.loadFile('live2d.html')
+    mainWindow.loadFile('live2d.html', {search: "width="+width+"&"+"height="+height})
     //关闭窗口时初始化主窗口(避免浪费内存)
     //监听到closed事件后执行
     mainWindow.on('closed', () => { mainWindow = null })
@@ -290,11 +306,11 @@ function showMainWin() {
     //获取窗口大小
     let winSize = mainWindow.getSize()
     //初始位置右下角
-    mainWindow.setPosition(size.width-winSize[0], size.height-winSize[1])
+    mainWindow.setPosition(size.width-winSize[0], size.height-winSize[1]); 
 }
 
 //创建chatting窗口
-function showChattingWin(textChatting) {
+function showChattingWin() {
     chattingWin=new BrowserWindow({
         width: chatting_width, height: chatting_height,
         frame: false,                //去掉窗口边框和标题栏
@@ -318,7 +334,7 @@ function showChattingWin(textChatting) {
     let startX = mainX-chatting_width-5; 
     let startY = mainY-(chatting_height-live2d_height); 
     if(startX<0) {
-        startX = mainX+livd2d_width+5; 
+        startX = mainX+live2d_width+5; 
     }
     if(startY<0) {
         startY = 0; 
@@ -327,15 +343,15 @@ function showChattingWin(textChatting) {
     
     chattingWin.webContents.on('did-finish-load',(event)=>{
         // 发送消息给渲染进程chattingWin
-        chattingWin.webContents.send("openChatting", textChatting); 
+        chattingWin.webContents.send("openChatting", chattingText); 
     });
 }
 
 //创建setting窗口
-function showSettingWin() {
+function showSettingWin(ifStart) {
     settingWin=new BrowserWindow({
         width: setting_width, height: setting_height,
-        frame: true, 
+        frame: false, 
         transparent: true,          //窗口透明
         resizable: true,            //是否允许改变窗口尺寸
         alwaysOnTop: true,          //窗口是否总是在最前端
@@ -346,10 +362,29 @@ function showSettingWin() {
         }
     }); 
     require("@electron/remote/main").enable(settingWin.webContents); 
-    settingWin.loadFile('live2d/setting.html'); 
+    settingWin.loadFile('live2d/setting.html', {search: "start="+ifStart}); 
     //关闭窗口时初始化主窗口(避免浪费内存)
     //监听到closed事件后执行
-    settingWin.on('closed', () => { chattingWin = null }); 
+    settingWin.on('closed', () => { settingWin = null }); 
+}
+
+//更改live2d界面
+function switchLive(newlive, newlive_id) {
+    var name=newlive; 
+    var live_path='live2d/model/'+name+'/'+name+'.model.json'; 
+    var size_path=__dirname+'/live2d/model/'+name+'/'+'size.json'; 
+    var fs=require('fs'); 
+    let stat=fs.statSync(size_path); 
+    if(stat.isFile()) {
+        morenLive2d=newlive_id; 
+        if(chattingWin!=null) chattingWin.destroy(); 
+        if(mainWindow!=null) mainWindow.destroy(); 
+        let dataS = fs.readFileSync(size_path, 'utf8');
+        let config = JSON.parse(dataS); 
+        showMainWin(config.width, config.height); 
+        //这里有时会加载失败，待改进
+        live2d_path=live_path; 
+    }
 }
 
 //所有窗口关闭时，退出APP

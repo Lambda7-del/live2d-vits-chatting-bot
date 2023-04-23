@@ -10,16 +10,28 @@
 <body>
     <div id="landlord">
         <div class="message" id="up_message" style="opacity: 0.;">こんにちは</div>
-        <canvas id="live2d" width="300" height="300" class="live2d"></canvas>
+        <canvas id="live2d" class="live2d"></canvas>
+        <script type="text/javascript">
+            var url = location.search; //获取url中"?“符后的字串
+            if (url.indexOf("?") != -1) {
+                var str = url.substr(1);
+                strs = str.split("&");
+                var width = decodeURIComponent(strs[0].replace("width=",""));//获取url中的id
+                var height= decodeURIComponent(strs[1].replace("height=",""));//获取url中的name
+                var canvas=document.getElementById("live2d"); 
+                canvas.width=width; 
+                canvas.height=height; 
+            }
+        </script>
         <div class="hide-button">隐藏</div>
         <div class="chatting-button">对话框</div>
     </div>
     <script>window.$ = window.jQuery = require('./live2d/js/jquery.min.js');</script>
+    <script type="text/javascript" src="live2d/js/live2d_r.js"></script>
     <script type="text/javascript" src="live2d/js/index.js"></script>
     <script type="text/javascript" src="live2d/js/message.js"></script>
-    <script type="text/javascript" src="live2d/js/live2d_r.js"></script>
     <script type="text/javascript">
-        loadlive2d("live2d", "live2d/model/shizuku/shizuku.model.json");
+        // loadlive2d("live2d", "live2d/model/shizuku/shizuku.model.json");
     </script>
     <script type="text/javascript" src="live2d/js/chattingMain.js"></script>
 </body>

@@ -1,10 +1,41 @@
 import vits
-ansNet=vits.vitsModel(hp_path="./vits/configs/ru.json", model_path="./vits/models/ru.pth")
-sid=94
+import os
+def load_models(): 
+    root='./vits/models/'
+    modelList={}
+    for path, file_dir, files in os.walk(root):
+        for file_name in files:
+            modelList[file_name[:-4]]=0
+    root='./vits/configs/'
+    configList={}
+    for path, file_dir, files in os.walk(root):
+        for file_name in files:
+            configList[file_name[:-5]]=0
+    ans=''
+    for k, v in configList.items(): 
+        if k in modelList: 
+            ans=k
+            break
+    return ans
+startVits=load_models()
+ansNet=None # vits model
+if startVits!='': 
+    hp="./vits/configs/"+startVits+".json"
+    mp="./vits/models/"+startVits+".pth"
+    ansNet=vits.vitsModel(hp_path=hp, model_path=mp)
+sid=0
 
 from playsound import playsound
 
 import chatGpt.chatgptConeect as cc
+import json
+def load_api_keys(): 
+    path='./chatGpt/openai_api_key.json'
+    with open(path) as f: 
+        data = json.load(f)
+    if len(data["keys"])>0: 
+        cc.changeApiKey(data["keys"][0])
+load_api_keys()
 chatNet=cc.chatgptContinueConnect()
 
 import text_dealing as td
