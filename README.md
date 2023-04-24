@@ -116,4 +116,4 @@ This module probably would be changed because chatgpt may become expensive in th
 
 # now process
 Connection among **vits**, **gpt** and **live2d** is built. 
-Can't choose speaker id and api-key in total process yet. 
+Choose vits-model, live2d-model, speaker-id and api-key in setting window. 
