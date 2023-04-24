@@ -1,4 +1,5 @@
 const electron = require('electron')
+const spawn = require('child_process').spawn
 
 //electron app
 const app = electron.app
@@ -43,6 +44,8 @@ var mainWindow = null
 var chattingWin = null
 //setting窗口对象
 var settingWin = null
+//python控制台对象
+var py=null
 //系统托盘对象
 var appTray = null
 
@@ -67,14 +70,9 @@ app.on('ready', () => {
             }
         },
         {
-            label: '关于',
-            click: function () {
-                //弹出一个窗口，内容为作品，作者描述
-            }
-        },
-        {
             label: '退出',
             click: function () {
+                var kill = spawn('taskkill', ["/pid", py.pid, "-f"]);
                 //退出程序
                 app.quit();
             }
@@ -219,6 +217,61 @@ ipcMain.on('getChattingWinPoint', (event, msg) => {
     event.returnValue = pos;
 })
 
+//ipc监听，拖拽settingWin
+ipcMain.on('dragSettingWin', (event, mouseOnPage) => {
+    //1.获取鼠标新位置
+    const { x, y } = screen_main.getCursorScreenPoint();
+    // console.log("鼠标新左键坐标:" + x + " " + y)
+    // console.log("接收鼠标相对于窗口坐标:" + mouseOnPage[0] + " " + mouseOnPage[1])
+
+    //2.计算窗口新坐标
+    let newWinPointX = x - mouseOnPage[0];
+    let newWinPointY = y - mouseOnPage[1];
+
+    //3.禁止超出屏幕
+    //获取桌面大小
+    let size = screen_main.getPrimaryDisplay().workAreaSize
+    //获取窗口大小
+    let winSize = settingWin.getSize()
+    //窗口四个代表性边缘坐标值
+    //上边
+    let winPoint_up_y = newWinPointY;
+    //下边
+    let winPoint_down_y = newWinPointY + winSize[1]
+    //左边
+    let winPoint_left_x = newWinPointX
+    //右边
+    let winPoint_right_x = newWinPointX + winSize[0]
+
+    //窗口上方超出屏幕，重置Y为0
+    if (winPoint_up_y < 0) {
+        newWinPointY = 0;
+    }
+    //窗口下方超出屏幕，重置Y为 屏幕高度最大值 - 窗口高度
+    if (winPoint_down_y > size.height) {
+        newWinPointY = size.height - winSize[1];
+    }
+    //窗口左边超出屏幕，重置X为0
+    if (winPoint_left_x < 0) {
+        newWinPointX = 0;
+    }
+    //窗口左边超出屏幕，重置X为 屏幕长度最大值 - 窗口长度
+    if (winPoint_right_x > size.width) {
+        newWinPointX = size.width - winSize[0];
+    }
+
+    //4.移动窗口
+    settingWin.setPosition(newWinPointX, newWinPointY);
+    settingWin.setSize(setting_width, setting_height); 
+    settingWin.transparent = true;
+})
+
+//ipc监听，获取settingWin位置
+ipcMain.on('getSettingWinPoint', (event, msg) => {
+    const pos = settingWin.getPosition();
+    event.returnValue = pos;
+})
+
 //ipc监听，打开chattingBox
 ipcMain.on('openChatting', (event) => {
     showChattingWin(); 
@@ -245,13 +298,12 @@ ipcMain.on("changeVits", (event, data) => {
 
 //ipc监听，更改speaker
 ipcMain.on("changeSpeaker", (event, data) => {
-    console.log(data); 
     morenSpeaker=data; 
 })
 
 //ipc监听，更改api-key
 ipcMain.on("changeApiKey", (event, data) => {
-    morenKey=data; 
+    morenKey=data.toString; 
 })
 
 //ipc监听，设置setting默认值
@@ -390,14 +442,13 @@ function switchLive(newlive, newlive_id) {
 //所有窗口关闭时，退出APP
 app.on('window-all-closed', function () {
     if (process.platform !== 'darwin') {
-        app.quit()
+        app.quit(); 
     }
 })
 
 //启动api.py
 function startPython() {
-    const spawn = require('child_process').spawn
-    let py = spawn('python', ['api.py'])
+    py = spawn('python', ['api.py'])
     py.stdout.on('data', data => console.log('data : ', data.toString()))
     py.on('close', ()=>{
     // Python ends, do stuff
