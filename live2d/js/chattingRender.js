@@ -24,13 +24,13 @@ function sending() {
             var mm=date.getMinutes();
             if(mm<10) var time=hour+':0'+mm;
             else var time=hour+':'+mm;
-            var ans='<div class="chat_right_item_1 clearfix">ME</div>'+
+            var ans='<div class="chat_right_item_1">ME</div>'+
                 '<div class="chat_right_item_2">'+
-                    '<div class="chat_right_time clearfix">'+time+'</div>'+
-                    '<div class="chat_right_content clearfix">'+str+'</div>'
+                    '<div class="chat_right_time">'+time+'</div>'+
+                    '<div class="chat_right_content">'+str+'</div>'
                     +'</div>';
             var oLi=document.createElement("div");
-            oLi.setAttribute("class","chat_right");
+            oLi.setAttribute("class","chat_right clearfix");
             oLi.innerHTML=ans;
             send_message.append(oLi);
             message.value="";
@@ -69,13 +69,13 @@ function showReply(str) {
         var mm=date.getMinutes();
         if(mm<10) var time=hour+':0'+mm;
         else var time=hour+':'+mm;
-        var ans='<div class="chat_left_item_1 clearfix">TA</div>'+
+        var ans='<div class="chat_left_item_1">TA</div>'+
             '<div class="chat_left_item_2">'+
-                '<div class="chat_left_time clearfix">'+time+'</div>'+
-                '<div class="chat_left_content clearfix">'+str+'</div>'
+                '<div class="chat_left_time">'+time+'</div>'+
+                '<div class="chat_left_content">'+str+'</div>'
                 +'</div>';
         var oLi=document.createElement("div");
-        oLi.setAttribute("class","chat_left");
+        oLi.setAttribute("class","chat_left clearfix");
         oLi.innerHTML=ans;
         reply_message.append(oLi);
         // 保存信息
@@ -95,7 +95,7 @@ function showChatting(chattingText) {
             textChatting+='<div class="chat_left clearfix"><div class="chat_left_item_1 ">TA</div><div class="chat_left_item_2"><div class="chat_time">'+chattingText[i]['time']+'</div><div class="chat_left_content">'+chattingText[i]['text']+'</div></div></div>';
         }
         else {
-            textChatting+='<div class="chat_right"><div class="chat_right_item_1 ">ME</div><div class="chat_right_item_2 "><div class="chat_right_time">'+chattingText[i]['time']+'</div><div class="chat_right_content">'+chattingText[i]['text']+'</div></div></div>';
+            textChatting+='<div class="chat_right clearfix"><div class="chat_right_item_1 ">ME</div><div class="chat_right_item_2 "><div class="chat_right_time">'+chattingText[i]['time']+'</div><div class="chat_right_content">'+chattingText[i]['text']+'</div></div></div>';
         }
     }
     textBox.html(textChatting); 
