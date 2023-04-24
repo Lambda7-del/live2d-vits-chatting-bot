@@ -15,7 +15,7 @@ This project includes:
 ## Environment setting
 ### Download the project.  
 ```sh
-git clone XXX
+git clone https://github.com/Lambda7-del/live2d-vits-chatting-bot.git
 ```
 ### Node.js
 Move in project directory and install **electron** and **@electron.remote**. 
