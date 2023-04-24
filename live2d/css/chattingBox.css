@@ -46,8 +46,9 @@
 }
 .chat_left{
     width: 100%;
-    height: 120px;
+    height: auto;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 .chat_left_item_1{
     width: 50px;
@@ -64,7 +65,7 @@
 }
 .chat_left_item_2{
     width: 55%;
-    height: 100px;
+    height: auto;
     float: left;
     margin-top: 10px;
 }
@@ -82,8 +83,9 @@
 /* 右边 */
 .chat_right{
     width: 100%;
-    height: 120px;
+    height: auto;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 .chat_right_item_1{
     width: 50px;
@@ -100,7 +102,7 @@
 }
 .chat_right_item_2{
     width: 55%;
-    height: 100px;
+    height: auto;
     float: right;
     margin-top: 10px;
 }
