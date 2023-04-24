@@ -111,7 +111,7 @@ This module probably would be changed because chatgpt may become expensive in th
 3. An interface based on thinter is built, where user can input text and get reply from chatting-bot and choose **api-key** of openai. 
 
 # test
-1. total process: start with package.json, npm start. 
+1. total process: start with package.json. 
 2. gpt-vits only: python test.py
 
 # now process
