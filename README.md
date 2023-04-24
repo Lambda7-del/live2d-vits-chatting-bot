@@ -58,8 +58,8 @@ Start program
 npm start
 ```
 ## quit
-Can only quit by tray. 
-右击托盘图标点击退出
+Can only quit by tray.  
+右击托盘图标点击退出  
 （我tm为啥要写英文，真的难顶。。。）
 
 # live2d
