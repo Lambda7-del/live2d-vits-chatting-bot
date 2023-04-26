@@ -25,8 +25,14 @@ npm install @electron/remote --save-dev
 ```
 ### Python
 Install python package. The torch for cuda may need to be install through downloading wheel. 
-```sh
+``` sh
 pip install -r requirements.txt
+```
+run **vits/monotonic_align/setup.py**
+``` sh
+cd vits/monotonic_align
+python setup.py
+cd ../..
 ```
 ## File setting
 ### live2d model
