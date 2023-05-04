@@ -19,4 +19,4 @@ indic_transliteration==2.3.37
 num_thai==0.0.5
 playsound==1.2.2
 langid==1.1.6
-flask==2.2.2
+flask==2.2.5
